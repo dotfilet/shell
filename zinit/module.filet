@@ -1,0 +1,16 @@
+use zsh
+
+if [[ ! -d ~/.local/share/zinit ]]; then
+  mkdir -p ~/.local/share
+  git checkout https://github.com/zdharma-continuum/zinit ~/.local/share/zinit
+else
+  if ! typeset -f zinit > /dev/null; then
+    set +e
+    source ~/.local/share/zinit/zinit.zsh
+    set -e
+  fi
+
+  zinit self-update
+fi
+
+copy ~/.zshrc.d

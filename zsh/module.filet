@@ -1,0 +1,53 @@
+copy ~/.zshrc
+
+mkdir -p ~/.zshrc.d/ ~/.zshrc.d/first ~/.zshrc.d/last
+copy ~/.zshrc.d
+
+ZSH_PATHS=('$path')
+
+zsh_prepend_path() {
+  local new_path="${1}"
+  local before="${2:-"\$path"}"
+
+  log_debug "zsh_prepend_path ${new_path} before ${before}"
+
+  for i in {1..${#ZSH_PATHS[@]}}; do
+    if [[ "${ZSH_PATHS[$i]}" == "${before}" ]]; then
+      write_zprofile "${ZSH_PATHS[@]:0:$i-1}" "${new_path}" "${ZSH_PATHS[@]:$i-1}"
+      return
+    fi
+  done
+
+  write_zprofile "${ZSH_PATHS[@]}" "${new_path}"
+}
+
+zsh_append_path() {
+  local new_path="${1}"
+  local after="${2:-"\$path"}"
+
+  log_debug "zsh_append_path ${new_path} after ${after}"
+
+  for i in {1..${#ZSH_PATHS[@]}}; do
+    if [[ "${ZSH_PATHS[$i]}" == "${after}" ]]; then
+      write_zprofile "${ZSH_PATHS[@]:0:$i}" "${new_path}" "${ZSH_PATHS[@]:$i}"
+      return
+    fi
+  done
+
+  write_zprofile "${ZSH_PATHS[@]}" "${new_path}"
+}
+
+write_zprofile() {
+  ZSH_PATHS=("$@")
+
+  echo "path=(" > ~/.zprofile
+  for entry in "${ZSH_PATHS[@]}"; do
+    echo "  ${entry}" >> ~/.zprofile
+  done
+  echo ")" >> ~/.zprofile
+  echo >> ~/.zprofile
+}
+
+if [[ -d /opt/homebrew/bin ]]; then
+  zsh_prepend_path /opt/homebrew/bin
+fi
