@@ -7,7 +7,7 @@ ZSH_PATHS=('$path')
 
 zsh_prepend_path() {
   local new_path="${1}"
-  local before="${2:-"\$path"}"
+  local before="${2:-${ZSH_PATHS[1]}}"
 
   log_debug "zsh_prepend_path ${new_path} before ${before}"
 
